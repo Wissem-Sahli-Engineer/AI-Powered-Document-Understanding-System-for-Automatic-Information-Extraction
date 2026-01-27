@@ -1,2 +1,3 @@
 Pillow
 split-folders
+pdf2image

@@ -1,8 +1,9 @@
 invoice_number
 invoice_date
-supplier_name
 total_amount
 currency
 
-vat_amount
-payment_due_date
+-optional : 
+    supplier_name
+    vat_amount
+    payment_due_date
