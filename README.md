@@ -35,4 +35,20 @@ Problem 150 in 1 pdf : each page is an invoice !
 
 So pdf => .png files 
 
-using python (pdf2image ) agian create a fuction named convertor_pdf_png, downloading poppler (So python could count the pages) and copy the path of its bin ( insdie the liraby folder ) after unexrating from .zip ( downlink : https://github.com/oschwartz10612/poppler-windows/releases/ ) 
+using python (pdf2image ) agian create a fuction named convertor_pdf_png, downloading poppler (So python could count the pages) and copy the path of its bin ( insdie the liraby folder ) after unexrating from .zip ( downlink : https://github.com/oschwartz10612/poppler-windows/releases/ ) and split them using spliter.py
+
+json : {
+  FACTURE N°      → invoice_number
+  DATE            → invoice_date
+  CLIENT          → client_name
+  Total Facture   → total_amount
+  Devise          → currency
+}
+annotation 
+
+train (35) : 1 2 3 4 5 7 9 13 17 18 ...  
+test (8) : 6 8 10 12 15 16 19 26
+val (7) : 11 14 24 32 43 47 50 
+
+create json_convert to convert .png to.json ( that i will manully annoate later , NB we used natsorted so we can sort the images and took the first 50 ones)
+
