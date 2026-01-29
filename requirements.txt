@@ -2,3 +2,5 @@ Pillow
 split-folders
 pdf2image
 natsort
+opencv-python
+pytesseract

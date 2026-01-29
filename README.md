@@ -29,6 +29,10 @@ each invoice gets a JSON exemple :
 store in data/annotations/ner/
 nb : Filename must match image name.
 
+
+PROJECT SHIFT 
+
+
 Got 150 invoices from OACA they all clean adn structuted i ll start using them 
 
 Problem 150 in 1 pdf : each page is an invoice ! 
@@ -51,4 +55,21 @@ test (8) : 6 8 10 12 15 16 19 26
 val (7) : 11 14 24 32 43 47 50 
 
 create json_convert to convert .png to.json ( that i will manully annoate later , NB we used natsorted so we can sort the images and took the first 50 ones)
+
+creating a proprocces python file to convert the image to greyscale and Denoise (Clean up digital dust) ! ( i used cv2 )
+
+text extration :
+nb : Why didn’t i use bounding boxes ?
+Because the invoices followed a consistent layout and high scan quality, I opted for a full-page OCR approach to simplify the pipeline and reduce error propagation, while keeping the architecture extensible for layout-based models later.
+
+1-Choose OCR engine (important decision)
+Use Tesseract OCR ( French language support is excellent + Works very well on clean scans)
+
+Tesseract is an external program so downloading from : 
+https://github.com/UB-Mannheim/tesseract/wiki
+
+2-Extract text line by line
+3-Normalize Save OCR results in a clean format
+
+create ocr_visualizer to check if the tesserarct_ocr worked well , by drawing boxes in the image for each text ( we could see , it doesnt capture the arabic texte) ( ocr_check.png)
 
