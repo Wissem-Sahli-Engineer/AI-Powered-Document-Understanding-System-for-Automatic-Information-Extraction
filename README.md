@@ -73,3 +73,5 @@ https://github.com/UB-Mannheim/tesseract/wiki
 
 create ocr_visualizer to check if the tesserarct_ocr worked well , by drawing boxes in the image for each text ( we could see , it doesnt capture the arabic texte) ( ocr_check.png)
 
+Data Mapping & NER Annotation 
+Using a BIO (Beginning, Inside, Outside) tagging strategy, a Python mapping script aligns manual annotations (e.g., Client Name, Total Amount) with the spatial coordinates provided by Tesseract OCR.
