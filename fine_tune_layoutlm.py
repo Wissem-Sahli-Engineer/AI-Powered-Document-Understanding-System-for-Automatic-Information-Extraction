@@ -15,7 +15,7 @@ import numpy as np
 from seqeval.metrics import classification_report, f1_score, precision_score, recall_score
 from huggingface_hub import login
 
-login("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")
+login("Huugin_tokken")
 
 # 1. SETUP PATHS & LABELS
 DATA_DIR = Path(r"C:\Users\wgsom\Desktop\AI_Project\cv\ner_layoutlm")
