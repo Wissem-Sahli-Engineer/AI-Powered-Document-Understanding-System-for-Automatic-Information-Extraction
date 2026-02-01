@@ -1,2 +1,12 @@
 Pillow
 split-folders
+pdf2image
+natsort
+opencv-python
+pytesseract
+transformers[torch]
+datasets
+seqeval
+Pillow
+accelerate
+huggingface_hub
