@@ -3,14 +3,14 @@ split-folders
 pdf2image
 natsort
 opencv-python
-<<<<<<< HEAD
 pytesseract
 transformers[torch]
 datasets
 seqeval
-Pillow
 accelerate
 huggingface_hub
-=======
-pytesseract
->>>>>>> 997df5f066c3680280afb5e9705f4be7822de5b3
+fastapi
+uvicorn
+python-multipart
+streamlit
+requests

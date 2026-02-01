@@ -3,4 +3,6 @@ OACA.pdf
 data_oaca
 .env
 a.txt
-
+__pycache__/
+*.pyc
+.venv/
