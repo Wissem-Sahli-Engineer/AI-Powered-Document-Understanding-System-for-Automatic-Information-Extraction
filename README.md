@@ -1,7 +1,13 @@
 # OACA Invoice Extraction Pipeline: LayoutLMv3
 
 This project implements an end-to-end Intelligent Document Processing (IDP) pipeline to extract structured financial data from OACA (Office de l'Aviation Civile et des Aéroports) invoices.
+
+---
+
+<p align="center">
 <img src="/255shots_so.png" width="500"/>
+</p>
+---
 
 ## 📌 Project Overview
 The pipeline transforms raw, multi-page PDF documents into a structured dataset, applies computer vision preprocessing, and fine-tunes a **LayoutLMv3** model for Named Entity Recognition (NER).
