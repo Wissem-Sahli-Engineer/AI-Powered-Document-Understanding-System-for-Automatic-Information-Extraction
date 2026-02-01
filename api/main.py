@@ -19,7 +19,7 @@ from .schemas import InvoiceData, ExtractionResponse, HealthResponse
 
 # Configuration
 MODEL_PATH = Path(__file__).parent.parent / "data_oaca" / "layoutlmv3-oaca" / "checkpoint-200"
-TESSERACT_CMD = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+TESSERACT_CMD = os.getenv("TESSERACT_CMD", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
 
 # Global model references
 model = None
@@ -109,7 +109,7 @@ def run_ocr(image: Image.Image) -> dict:
 
 
 def extract_entities(image: Image.Image, words: list, boxes: list) -> dict:
-    """Run model inference and extract named entities"""
+    """Run model inference and extract named entities using word-level mapping"""
     global model, processor
     
     if model is None or processor is None:
@@ -125,75 +125,120 @@ def extract_entities(image: Image.Image, words: list, boxes: list) -> dict:
         return_tensors="pt", 
         truncation=True, 
         padding="max_length", 
-        max_length=512
+        max_length=512,
+        return_offsets_mapping=False
     )
-    encoding = {k: v.to(device) for k, v in encoding.items()}
+    
+    # Get word_ids to map tokens back to original words
+    word_ids = encoding.word_ids(batch_index=0)
+    
+    encoding_tensors = {k: v.to(device) for k, v in encoding.items()}
     
     # Inference
     with torch.no_grad():
-        outputs = model(**encoding)
+        outputs = model(**encoding_tensors)
     
     predictions = outputs.logits.argmax(-1).squeeze().tolist()
     id2label = model.config.id2label
     
-    # Aggregate entities
-    final_entities = {}
-    current_entity_label = None
-    current_entity_tokens = []
+    # Map token predictions to word-level predictions
+    # Use the first subtoken's prediction for each word
+    word_predictions = {}
+    for token_idx, word_id in enumerate(word_ids):
+        if word_id is not None and word_id not in word_predictions:
+            pred_label = id2label[predictions[token_idx]]
+            word_predictions[word_id] = pred_label
     
-    for i, pred_id in enumerate(predictions):
-        label = id2label[pred_id]
+    # Build entities from original words using BIO tags
+    final_entities = {}
+    current_entity_type = None
+    current_entity_words = []
+    
+    for word_idx in sorted(word_predictions.keys()):
+        label = word_predictions[word_idx]
         
         if label == "O":
-            if current_entity_label:
-                text = processor.tokenizer.decode(current_entity_tokens).strip()
-                if text not in ["<s>", "</s>", ""]:
-                    if current_entity_label not in final_entities:
-                        final_entities[current_entity_label] = []
-                    final_entities[current_entity_label].append(text)
-                current_entity_label = None
-                current_entity_tokens = []
+            # End current entity if exists
+            if current_entity_type and current_entity_words:
+                entity_text = " ".join(current_entity_words)
+                if current_entity_type not in final_entities:
+                    final_entities[current_entity_type] = []
+                final_entities[current_entity_type].append(entity_text)
+            current_entity_type = None
+            current_entity_words = []
             continue
         
-        # Extract entity type
+        # Parse BIO label
         if "-" in label:
             prefix, entity_type = label.split("-", 1)
         else:
             prefix = "B"
             entity_type = label
         
-        # Aggregate tokens
-        if current_entity_label == entity_type:
-            current_entity_tokens.append(encoding["input_ids"][0][i])
-        else:
-            if current_entity_label:
-                text = processor.tokenizer.decode(current_entity_tokens).strip()
-                if text not in ["<s>", "</s>", ""]:
-                    if current_entity_label not in final_entities:
-                        final_entities[current_entity_label] = []
-                    final_entities[current_entity_label].append(text)
+        if prefix == "B":
+            # Begin new entity - save previous if exists
+            if current_entity_type and current_entity_words:
+                entity_text = " ".join(current_entity_words)
+                if current_entity_type not in final_entities:
+                    final_entities[current_entity_type] = []
+                final_entities[current_entity_type].append(entity_text)
             
-            current_entity_label = entity_type
-            current_entity_tokens = [encoding["input_ids"][0][i]]
+            current_entity_type = entity_type
+            current_entity_words = [words[word_idx]]
+        elif prefix == "I" and current_entity_type == entity_type:
+            # Continue current entity
+            current_entity_words.append(words[word_idx])
+        else:
+            # I- tag without matching B- tag, treat as new entity
+            if current_entity_type and current_entity_words:
+                entity_text = " ".join(current_entity_words)
+                if current_entity_type not in final_entities:
+                    final_entities[current_entity_type] = []
+                final_entities[current_entity_type].append(entity_text)
+            
+            current_entity_type = entity_type
+            current_entity_words = [words[word_idx]]
     
     # Flush last entity
-    if current_entity_label:
-        text = processor.tokenizer.decode(current_entity_tokens).strip()
-        if text not in ["<s>", "</s>", ""]:
-            if current_entity_label not in final_entities:
-                final_entities[current_entity_label] = []
-            final_entities[current_entity_label].append(text)
+    if current_entity_type and current_entity_words:
+        entity_text = " ".join(current_entity_words)
+        if current_entity_type not in final_entities:
+            final_entities[current_entity_type] = []
+        final_entities[current_entity_type].append(entity_text)
     
     return final_entities
 
 
-def map_entities_to_invoice(entities: dict) -> InvoiceData:
-    """Map extracted entities to InvoiceData schema"""
+def find_total_fallback(words: list) -> str:
+    """Heuristic fallback to find total amount if model fails"""
+    keywords = ["TOTAL", "FACTURE", "NET", "PAYER", "SOMME"]
+    for i, word in enumerate(words):
+        if any(kw in word.upper() for kw in keywords):
+            # Look at the next few words for something that looks like a number
+            for j in range(i + 1, min(i + 6, len(words))):
+                candidate = words[j].replace(",", ".")
+                # Look for something with digits and potentially a decimal
+                if any(c.isdigit() for c in candidate) and ('.' in candidate or len(candidate) > 3):
+                    return words[j]
+    return None
+
+
+def map_entities_to_invoice(entities: dict, all_words: list = None) -> InvoiceData:
+    """Map extracted entities to InvoiceData schema with fallback support"""
+    # Try to get from AI detected entities
+    total = " | ".join(entities.get("TOTAL", []))
+    
+    # If not detected, try fallback
+    if (not total or total == "None") and all_words:
+        fallback_total = find_total_fallback(all_words)
+        if fallback_total:
+            total = fallback_total
+            
     return InvoiceData(
         invoice_number=" | ".join(entities.get("INVOICE_NO", [])) or None,
         invoice_date=" | ".join(entities.get("DATE", [])) or None,
         client_name=" | ".join(entities.get("CLIENT", [])) or None,
-        total_amount=" | ".join(entities.get("TOTAL", [])) or None,
+        total_amount=total or None,
         currency=" | ".join(entities.get("CURRENCY", [])) or None,
     )
 
@@ -246,7 +291,7 @@ async def extract_invoice(file: UploadFile = File(...)):
         entities = extract_entities(image, ocr_result["words"], ocr_result["boxes"])
         
         # Map to schema
-        invoice_data = map_entities_to_invoice(entities)
+        invoice_data = map_entities_to_invoice(entities, ocr_result["words"])
         
         # Cleanup
         os.unlink(tmp_path)

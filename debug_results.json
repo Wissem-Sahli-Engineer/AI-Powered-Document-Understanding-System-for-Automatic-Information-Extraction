@@ -1,0 +1,25 @@
+{
+  "ocr_text": "CK, aI, Uegoll 4 gasoll Sljsboll Slgasa ke (GZ \u2014 OFFICE DE AVIATION CIVILE ET DES AEROPORTS Wwww.oaca.nat.tn FACTURE AU COMPTANT - REDEVANCES AERONAUTIQUES OFFCE DE L'AVIATION CIVILE ET DES AEROPORTS AEROPORT INTERNATIONAL DE TUNIS CARTHAGE B.P.:137 ET 147 Tunis c\u00e9dex 1080 Tel: 71 102 200 Fax: 71751 422 FACTURE N\u00b0 AC1627 DATE : 03/08/2023 CLIENT: TRANSAVIA FRANCE ADRESSE: 18 AV. LOUIS BLERIOT 91220 PARAY -VIELLE-POSTE N\u00b0.C.C.: 41010354 MATRICULE FISCAL :FR34492791306 AEROPORT AEROPORT INTERNATIONAL DE TUNIS CARTHAGE Arriv\u00e9e D\u00e9part Immatric Type Poid Nature Vol Num Vol Pax. Date Vol Num Vol Pax. Date Vol FGZHZ B738 70530 REGULIER 8858 182 29/07/2023 8859 135 30/07/2023 TVA Redevance Montant en DT Taux change Taux Montant en DT Atterissage International 1,858.428 TND 3.43200 EUR 19% 0.000 TND Balisage Arrivee 82.368 TND 3.43200 EUR 19% 0.000 TND Balisage Depart 82.368 TND 3.43200 EUR 19% 0.000 TND Embarquement 5,096.520 TND 3.43200 EUR 19% 0.000 TND Meteo Arrivee 86.487 TND 3.43200 EUR 0% 0.000 TND Meteo Depart 86.487 TND 3.43200 EUR 0% 0.000 TND Route Arrivee 1,081.080 TND 3.43200 EUR 19% 0.000 TND Route Depart 1,081.080 TND 3.43200 EUR 19% 0.000 TND Stat. 19-07 total 160.824 TND 3.43200 EUR 19% 0.000 TND Surete 741.312 TND 3.43200 EUR 19% 0.000 TND Taxe pax vols international 3,640.000 TND 1.00000 TND 0% 0.000 TND Total H.T en DT Total TVA en DT Droit de timbre Total Facture 13,996.954 TND 0.000 TND 1.000 13,997.954 TND ARRETEE LA PRESENTE FACTURE A LA SOMME DE: : TREIZE MILLE NEUF CENT QUATRE-VINGT-DIX-SEPT TNDS NEUF CENT CINQUANTE-QUATRE MILLIMES Devise: Montant en Devise Mode de paiement Facture avec statut: GENEREE R.C. B1106721996 Code assujetti T.V.A : 0011864D/A/M/000 Date limite de d\u00e9p\u00e9t des r\u00e9clamations: 60 jours a compter de la date de la facture Paiement : D\u00e9s r\u00e9ception de la pr\u00e9sente facture ; Par virement aux: - C.C.P. 17 001 0000000 098 366 67 ou - C.C.B. Attijari Banque Charguia IBAN (TN59)04 115 08 04 04 700 55 35 10; Swift: BSTUTNTT ou - C.C.B. UIB Charguia IBAN (TN59)12 203 000 6 300 000 15 907; Swift: UIBKTNTT. Ne pas omettre d'indiquer sur votre reglement le num\u00e9ro et la date de la facture; Tout retard de r\u00e9glement entrainera le paiement des int\u00e9r\u00e9ts de retard. 07/08/2023 03:21:15 Page lde 1",
+  "predictions": [
+    {
+      "word": "AC1627",
+      "label": "B-INVOICE_NO"
+    },
+    {
+      "word": "03/08/2023",
+      "label": "B-DATE"
+    },
+    {
+      "word": "TRANSAVIA",
+      "label": "B-CLIENT"
+    },
+    {
+      "word": "FRANCE",
+      "label": "I-CLIENT"
+    },
+    {
+      "word": "TND",
+      "label": "B-CURRENCY"
+    }
+  ]
+}
